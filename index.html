@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="tr">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parfüm Kataloğu</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cormorant Garamond', 'Georgia', serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 100%);
+      color: #f5f5f5;
+      min-height: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+      padding-bottom: 40px;
+      border-bottom: 2px solid #8b0000;
+    }
+
+    h1 {
+      font-size: 64px;
+      font-weight: 300;
+      letter-spacing: 8px;
+      margin: 0 0 15px 0;
+      background: linear-gradient(135deg, #d4af37 0%, #f4e5b8 50%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      color: #d4af37;
+      letter-spacing: 2px;
+      font-weight: 300;
+      font-family: 'Brush Script MT', 'Lucida Handwriting', 'Apple Chancery', cursive;
+      font-style: italic;
+    }
+
+    .search-filter-section {
+      max-width: 900px;
+      margin: 0 auto 50px auto;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 30px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #d4af37;
+      pointer-events: none;
+    }
+
+    #search-input {
+      width: 100%;
+      padding: 18px 20px 18px 55px;
+      background: rgba(26, 10, 10, 0.8);
+      border: 2px solid #8b0000;
+      border-radius: 50px;
+      color: #f5f5f5;
+      font-size: 16px;
+      font-family: 'Georgia', serif;
+      transition: all 0.3s ease;
+    }
+
+    #search-input::placeholder {
+      color: #888;
+    }
+
+    #search-input:focus {
+      outline: none;
+      border-color: #d4af37;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+
+    .filter-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 12px 30px;
+      background: rgba(26, 10, 10, 0.6);
+      border: 1px solid #8b0000;
+      border-radius: 25px;
+      color: #d4af37;
+      font-size: 14px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Georgia', serif;
+      text-transform: uppercase;
+    }
+
+    .filter-btn:hover {
+      background: rgba(139, 0, 0, 0.4);
+      border-color: #d4af37;
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, #d4af37 0%, #f4e5b8 100%);
+      color: #0a0a0a;
+      border-color: #d4af37;
+      font-weight: 600;
+    }
+
+    .perfume-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 40px;
+      margin-top: 40px;
+    }
+
+    .perfume-card {
+      background: linear-gradient(145deg, #1a0a0a 0%, #2a1515 100%);
+      border: 1px solid #8b0000;
+      border-radius: 12px;
+      padding: 32px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(139, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .perfume-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(212, 175, 55, 0.4);
+      border-color: #d4af37;
+    }
+
+    .favorite-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(26, 10, 10, 0.9);
+      border: 1px solid #8b0000;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .favorite-btn:hover {
+      background: rgba(139, 0, 0, 0.5);
+      border-color: #d4af37;
+      transform: scale(1.1);
+    }
+
+    .favorite-btn.favorited {
+      background: linear-gradient(135deg, #d4af37 0%, #f4e5b8 100%);
+      border-color: #d4af37;
+    }
+
+    .favorite-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: #d4af37;
+      fill: none;
+      transition: all 0.3s ease;
+    }
+
+    .favorite-btn.favorited svg {
+      fill: #8b0000;
+      stroke: #8b0000;
+    }
+
+    .category-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(212, 175, 55, 0.2);
+      border: 1px solid #d4af37;
+      border-radius: 15px;
+      font-size: 11px;
+      color: #d4af37;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .brand {
+      font-size: 14px;
+      color: #d4af37;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .perfume-name {
+      font-size: 28px;
+      color: #f5f5f5;
+      margin: 0 0 20px 0;
+      font-weight: 400;
+      letter-spacing: 2px;
+    }
+
+    .notes-section {
+      margin-top: 20px;
+    }
+
+    .notes-title {
+      font-size: 13px;
+      color: #8b0000;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .notes {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #d4d4d4;
+      font-family: 'Georgia', serif;
+    }
+
+    .store-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(139, 0, 0, 0.3);
+      border: 1px solid #8b0000;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #d4af37;
+      letter-spacing: 1px;
+      margin-top: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 40px 20px;
+      }
+
+      h1 {
+        font-size: 42px;
+        letter-spacing: 4px;
+      }
+
+      .subtitle {
+        font-size: 18px;
+        letter-spacing: 2px;
+      }
+
+      .perfume-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container">
+   <header>
+    <h1 id="site-title">Maison de Scent</h1>
+    <div class="subtitle" id="site-subtitle">
+     by n.neva tunc
+    </div>
+   </header>
+   <div class="search-filter-section">
+    <div class="search-box">
+     <svg class="search-icon" width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle> <path d="m21 21-4.35-4.35"></path>
+     </svg><input type="text" id="search-input" placeholder="Parfüm ara (marka, isim veya koku notası)...">
+    </div>
+    <div class="filter-buttons"><button class="filter-btn active" data-category="all">Tümü</button> <button class="filter-btn" data-category="kadın">Kadın</button> <button class="filter-btn" data-category="erkek">Erkek</button> <button class="filter-btn" data-category="unisex">Unisex</button>
+    </div>
+   </div>
+   <div class="perfume-grid" id="perfume-grid"></div>
+  </div>
+  <script>
+    const defaultConfig = {
+      site_title: "Maison de Scent",
+      site_subtitle: "by n.neva tunc",
+      background_color: "#0a0a0a",
+      accent_color: "#d4af37",
+      border_color: "#8b0000",
+      text_color: "#f5f5f5",
+      card_background: "#1a0a0a"
+    };
+
+    const perfumes = [
+      {id: 1, brand: "TOM FORD", name: "Black Orchid", notes: "Üst Notalar: Siyah Truffle, Ylang-Ylang, Bergamot\nOrta Notalar: Siyah Orkide, Çikolata, Baharat\nDip Notalar: Amber, Vanilya, Paçuli", store: "Sephora & Beymen", category: "unisex"},
+      {id: 2, brand: "DIOR", name: "J'adore", notes: "Üst Notalar: Ylang-Ylang, Bergamot, Şeftali\nOrta Notalar: Yasemin, Gül, Orkide\nDip Notalar: Sedir, Misk, Vanilya", store: "Sephora & Beymen", category: "kadın"},
+      {id: 3, brand: "CHANEL", name: "Coco Mademoiselle", notes: "Üst Notalar: Bergamot, Portakal\nOrta Notalar: Yasemin, Gül, Ylang-Ylang\nDip Notalar: Paçuli, Vanilya, Beyaz Misk", store: "Sephora", category: "kadın"},
+      {id: 4, brand: "VIKTOR & ROLF", name: "Flowerbomb", notes: "Üst Notalar: Bergamot, Çay\nOrta Notalar: Yasemin, Gül, Orkide, Hanımeli\nDip Notalar: Paçuli, Misk", store: "Sephora", category: "kadın"},
+      {id: 5, brand: "YSL", name: "Black Opium", notes: "Üst Notalar: Armut, Portakal Çiçeği, Yasemin\nOrta Notalar: Kahve, Yasemin, Portakal Çiçeği\nDip Notalar: Vanilya, Sedir, Paçuli", store: "Sephora & Beymen", category: "kadın"},
+      {id: 6, brand: "GUCCI", name: "Bloom", notes: "Üst Notalar: Yasemin, Tuberoz, Çekirdek\nOrta Notalar: Mimoza, Yasemin\nDip Notalar: Kehribar, Vanilya", store: "Beymen", category: "kadın"},
+      {id: 7, brand: "LANCÔME", name: "La Vie Est Belle", notes: "Üst Notalar: Armut, Frenk Üzümü\nOrta Notalar: Yasemin, Portakal Çiçeği\nDip Notalar: Tonka Fasulyesi, Vanilya, Paçuli", store: "Sephora", category: "kadın"},
+      {id: 8, brand: "YSL", name: "Libre", notes: "Üst Notalar: Lavanta, Böğürtlen\nOrta Notalar: Orkide, Portakal Çiçeği\nDip Notalar: Vanilya, Sedir", store: "Sephora & Beymen", category: "kadın"},
+      {id: 9, brand: "CAROLINA HERRERA", name: "Good Girl", notes: "Üst Notalar: Badem, Kahve, Yasemin\nOrta Notalar: Yasemin, Portakal Çiçeği\nDip Notalar: Paçuli, Kakao, Vanilya", store: "Sephora & Beymen", category: "kadın"},
+      {id: 10, brand: "DOLCE & GABBANA", name: "Light Blue Woman", notes: "Üst Notalar: Limon, Sedir, Elma\nOrta Notalar: Yasemin, Odunsu Notalar\nDip Notalar: Amber, Misk", store: "Sephora & Beymen", category: "kadın"},
+      {id: 11, brand: "CHANEL", name: "Chance Eau Tendre", notes: "Üst Notalar: Greyfurt, Kantalup Kavunu\nOrta Notalar: Yasemin, Portakal Çiçeği\nDip Notalar: Kehribar, Misk", store: "Sephora", category: "kadın"},
+      {id: 12, brand: "LANCÔME", name: "Idôle", notes: "Üst Notalar: Bergamot, Armut\nOrta Notalar: Gül, Yasemin\nDip Notalar: Vanilya, Misk", store: "Sephora", category: "kadın"},
+      {id: 13, brand: "MUGLER", name: "Alien", notes: "Üst Notalar: Yasemin\nOrta Notalar: Kehribar\nDip Notalar: Kaşmir Ağac��", store: "Sephora", category: "kadın"},
+      {id: 14, brand: "MARC JACOBS", name: "Daisy", notes: "Üst Notalar: Çilek, Menekşe Yaprağı\nOrta Notalar: Gardenya, Yasemin\nDip Notalar: Misk, Vanilya, Beyaz Odunsular", store: "Sephora", category: "kadın"},
+      {id: 15, brand: "GIORGIO ARMANI", name: "Si EDP", notes: "Üst Notalar: Frenk Üzümü\nOrta Notalar: Gül, Frezya\nDip Notalar: Vanilya, Paçuli, Sedir", store: "Beymen", category: "kadın"},
+      {id: 16, brand: "CHANEL", name: "No.5 EDP", notes: "Üst Notalar: Neroli, Aldehitler\nOrta Notalar: Yasemin, Gül\nDip Notalar: Sandal, Vanilya", store: "Sephora & Beymen", category: "kadın"},
+      {id: 17, brand: "DIOR", name: "Miss Dior Blooming Bouquet", notes: "Üst Notalar: Mandalina\nOrta Notalar: Şakayık, Gül\nDip Notalar: Beyaz Misk", store: "Sephora & Beymen", category: "kadın"},
+      {id: 18, brand: "CAROLINA HERRERA", name: "212 VIP", notes: "Üst Notalar: Marakuya\nOrta Notalar: Rum, Gardenya\nDip Notalar: Vanilya, Tonka", store: "Sephora", category: "kadın"},
+      {id: 19, brand: "GIVENCHY", name: "L'Interdit", notes: "Üst Notalar: Pembe Biber\nOrta Notalar: Yasemin, Tuberoz\nDip Notalar: Paçuli, Vetiver", store: "Sephora & Beymen", category: "kadın"},
+      {id: 20, brand: "JEAN PAUL GAULTIER", name: "Scandal", notes: "Üst Notalar: Portakal Çiçeği\nOrta Notalar: Bal, Gardenya\nDip Notalar: Paçuli", store: "Sephora", category: "kadın"},
+      {id: 21, brand: "GUCCI", name: "Flora Gorgeous Gardenia", notes: "Üst Notalar: Kızılcık\nOrta Notalar: Gardenya, Frangipani\nDip Notalar: Şeker, Paçuli", store: "Sephora & Beymen", category: "kadın"},
+      {id: 22, brand: "YSL", name: "Mon Paris", notes: "Üst Notalar: Çilek, Ahududu\nOrta Notalar: Yasemin, Şakayık\nDip Notalar: Paçuli, Misk", store: "Sephora & Beymen", category: "kadın"},
+      {id: 23, brand: "DOLCE & GABBANA", name: "Dolce", notes: "Üst Notalar: Neroli, Papaya\nOrta Notalar: Zambak, Nergis\nDip Notalar: Kaşmir, Misk", store: "Sephora & Beymen", category: "kadın"},
+      {id: 24, brand: "ELIE SAAB", name: "Le Parfum", notes: "Üst Notalar: Portakal Çiçeği\nOrta Notalar: Yasemin, Paçuli\nDip Notalar: Sedir, Bal", store: "Beymen", category: "kadın"},
+      {id: 25, brand: "PACO RABANNE", name: "Olympea", notes: "Üst Notalar: Yeşil Mandalina\nOrta Notalar: Zencefil Çiçeği\nDip Notalar: Tuzlu Vanilya, Ambergris", store: "Sephora", category: "kadın"},
+      {id: 26, brand: "BURBERRY", name: "Her", notes: "Üst Notalar: Çilek, Böğürtlen\nOrta Notalar: Yasemin\nDip Notalar: Amber, Misk", store: "Beymen", category: "kadın"},
+      {id: 27, brand: "CHLOÉ", name: "Chloé EDP", notes: "Üst Notalar: Frezya, Liçi\nOrta Notalar: Gül\nDip Notalar: Sedir, Amber", store: "Sephora & Beymen", category: "kadın"},
+      {id: 28, brand: "AERIN", name: "Amber Musk", notes: "Üst Notalar: Gül\nOrta Notalar: Amber\nDip Notalar: Misk, Vanilya", store: "Sephora", category: "kadın"},
+      {id: 29, brand: "NARCISO RODRIGUEZ", name: "For Her", notes: "����st Notalar: Bergamot\nOrta Notalar: Misk\nDip Notalar: Vanilya, Sedir", store: "Sephora & Beymen", category: "kadın"},
+      {id: 30, brand: "TIFFANY & CO", name: "Tiffany EDP", notes: "Üst Notalar: Mandalina\nOrta Notalar: Sümbülteber\nDip Notalar: Misk, Paçuli", store: "Beymen", category: "kadın"},
+      {id: 31, brand: "VALENTINO", name: "Donna", notes: "Üst Notalar: Bergamot\nOrta Notalar: Gül, Iris\nDip Notalar: Deri, Vanilya", store: "Beymen", category: "kadın"},
+      {id: 32, brand: "MONTBLANC", name: "Signature", notes: "Üst Notalar: Mandalina\nOrta Notalar: Ylang-Ylang, Şakayık\nDip Notalar: Vanilya, Misk", store: "Beymen", category: "kadın"},
+      {id: 33, brand: "BVLGARI", name: "Omnia Crystalline", notes: "Üst Notalar: Bambu, Armut\nOrta Notalar: Lotus, Çay\nDip Notalar: Misk, Sandal", store: "Beymen", category: "kadın"},
+      {id: 34, brand: "KENZO", name: "Flower by Kenzo", notes: "Üst Notalar: Gül, Frenk Üz��mü\nOrta Notalar: Menekşe\nDip Notalar: Vanilya, Misk", store: "Sephora", category: "kadın"},
+      {id: 35, brand: "HERMÈS", name: "Twilly d'Hermès", notes: "Üst Notalar: Zencefil\nOrta Notalar: Tuberoz\nDip Notalar: Sandal", store: "Beymen", category: "kadın"},
+      {id: 36, brand: "LANVIN", name: "Éclat d'Arpège", notes: "Üst Notalar: Limon, Yeşil Çay\nOrta Notalar: Şeftali, Şakayık\nDip Notalar: Sedir, Misk", store: "Sephora", category: "kadın"},
+      {id: 37, brand: "CACHAREL", name: "Yes I Am", notes: "Üst Notalar: Ahududu, Mandalina\nOrta Notalar: Zencefil Çiçeği\nDip Notalar: Amber, Sandal", store: "Sephora", category: "kadın"},
+      {id: 38, brand: "ZARA", name: "Red Vanilla", notes: "Üst Notalar: Siyah Frenk Üzümü\nOrta Notalar: Vanilya\nDip Notalar: Amber, Paçuli", store: "Sephora & Beymen", category: "kadın"},
+      {id: 39, brand: "ESCADA", name: "Especially Escada", notes: "Üst Notalar: Armut\nOrta Notalar: Gül\nDip Notalar: Misk", store: "Sephora", category: "kadın"},
+      {id: 40, brand: "CALVIN KLEIN", name: "Euphoria", notes: "Üst Notalar: Nar\nOrta Notalar: Orkide\nDip Notalar: Amber, Maun", store: "Sephora", category: "kadın"},
+      {id: 41, brand: "LANCÔME", name: "Trésor", notes: "Üst Notalar: Şeftali, Kayısı\nOrta Notalar: Gül, Iris\nDip Notalar: Vanilya, Amber", store: "Sephora", category: "kadın"},
+      {id: 42, brand: "JIMMY CHOO", name: "Jimmy Choo EDP", notes: "Üst Notalar: Armut, Portakal\nOrta Notalar: Kaplan Orkidesi\nDip Notalar: Paçuli", store: "Sephora & Beymen", category: "kadın"},
+      {id: 43, brand: "NINA RICCI", name: "Nina", notes: "Üst Notalar: Limon, Limon Çiçeği\nOrta Notalar: Elma, Karamelli Şeker\nDip Notalar: Misk, Sedir", store: "Sephora", category: "kadın"},
+      {id: 44, brand: "GUCCI", name: "Guilty Pour Femme", notes: "Üst Notalar: Bergamot\nOrta Notalar: Leylak\nDip Notalar: Paçuli", store: "Sephora & Beymen", category: "kadın"},
+      {id: 45, brand: "MAISON MARGIELA", name: "Replica – By the Fireplace", notes: "Üst Notalar: Kestane, Karabiber\nOrta Notalar: Karanfil, Guaiac\nDip Notalar: Vanilya, Tütsü", store: "Sephora & Beymen", category: "kadın"},
+      {id: 46, brand: "TOM FORD", name: "Black Orchid", notes: "Üst Notalar: Trüf, Yasemin\nOrta Notalar: Orkide, Baharatlar\nDip Notalar: Paçuli, Vanilya", store: "Beymen", category: "kadın"},
+      {id: 47, brand: "DOLCE & GABBANA", name: "The Only One", notes: "Üst Notalar: Bergamot, Portakal\nOrta Notalar: Kahve, Şeftali\nDip Notalar: Vanilya, Sedir", store: "Sephora & Beymen", category: "kadın"},
+      {id: 48, brand: "MOSCHINO", name: "Toy 2", notes: "Üst Notalar: Elma, Mandalina\nOrta Notalar: Yasemin, Şakayık\nDip Notalar: Amber, Sandal", store: "Sephora", category: "kadın"},
+      {id: 49, brand: "MICHAEL KORS", name: "Sexy Amber", notes: "Üst Notalar: Amber\nOrta Notalar: Çiçek Notaları\nDip Notalar: Sandal, Misk", store: "Beymen", category: "kadın"},
+      {id: 50, brand: "BURBERRY", name: "My Burberry", notes: "Üst Notalar: Bergamot, Greyfurt\nOrta Notalar: Gül, Frezya\nDip Notalar: Paçuli, Amber", store: "Beymen", category: "kadın"},
+      {id: 51, brand: "ZARA", name: "Femme", notes: "Üst Notalar: Bergamot\nOrta Notalar: Vanilya\nDip Notalar: Misk, Kehribar", store: "Sephora & Beymen", category: "kadın"},
+      {id: 52, brand: "MAISON FRANCIS KURKDJIAN", name: "Baccarat Rouge 540", notes: "Üst Notalar: Safran\nOrta Notalar: Amberwood, Ambergris\nDip Notalar: Sedir, Reçine", store: "Beymen", category: "unisex"},
+      {id: 53, brand: "INITIO", name: "Rehab", notes: "Üst Notalar: Lavanta, Bergamot\nOrta Notalar: Paçuli, Sandal\nDip Notalar: Vanilya, Misk", store: "Beymen", category: "unisex"},
+      {id: 54, brand: "INITIO", name: "Side Effect", notes: "Üst Notalar: Rom\nOrta Notalar: Tütün, Tarçın\nDip Notalar: Vanilya, Sedir", store: "Beymen", category: "unisex"},
+      {id: 55, brand: "TOM FORD", name: "Oud Wood", notes: "Üst Notalar: Bergamot, Biber\nOrta Notalar: Oud, Sandal\nDip Notalar: Amber, Vanilya", store: "Beymen", category: "unisex"},
+      {id: 56, brand: "TOM FORD", name: "Tobacco Vanille", notes: "Üst Notalar: Tütün Yaprağı, Baharatlar\nOrta Notalar: Vanilya, Kakao\nDip Notalar: Kurutulmuş Meyveler, Odunsu Notalar", store: "Beymen", category: "unisex"},
+      {id: 57, brand: "KILIAN", name: "Angels' Share", notes: "Üst Notalar: Konyağımsı Sıcak Notalar\nOrta Notalar: Tarçın, Tonka\nDip Notalar: Vanilya, Sandal", store: "Beymen", category: "unisex"},
+      {id: 58, brand: "KILIAN", name: "Love Don't Be Shy", notes: "Üst Notalar: Neroli\nOrta Notalar: Gül, Portakal Çiçeği\nDip Notalar: Vanilya, Marshmallow", store: "Beymen", category: "unisex"},
+      {id: 59, brand: "XERJOFF", name: "Erba Pura", notes: "Üst Notalar: Portakal, Limon\nOrta Notalar: Meyve Karışımı\nDip Notalar: Amber, Vanilya, Misk", store: "Beymen", category: "unisex"},
+      {id: 60, brand: "XERJOFF", name: "Naxos", notes: "Üst Notalar: Lavanta, Bergamot\nOrta Notalar: Bal, Tarçın\nDip Notalar: Tütün, Tonka", store: "Beymen", category: "unisex"},
+      {id: 61, brand: "MONTALE", name: "Intense Café", notes: "Üst Notalar: Çiçek Notaları\nOrta Notalar: Gül, Kahve\nDip Notalar: Vanilya, Amber", store: "Beymen", category: "unisex"},
+      {id: 62, brand: "MONTALE", name: "Dark Vanilla", notes: "Üst Notalar: Vanilya\nOrta Notalar: Amber\nDip Notalar: Sandal, Oud", store: "Beymen", category: "unisex"},
+      {id: 63, brand: "MANCERA", name: "Roses Vanille", notes: "Üst Notalar: Limon\nOrta Notalar: Gül\nDip Notalar: Vanilya, Misk", store: "Beymen", category: "unisex"},
+      {id: 64, brand: "MANCERA", name: "Instant Crush", notes: "Üst Notalar: Safran, Zencefil\nOrta Notalar: Yasemin, Gül\nDip Notalar: Amber, Vanilya, Sedir", store: "Beymen", category: "unisex"},
+      {id: 65, brand: "MAISON MARGIELA", name: "By the Fireplace", notes: "Üst Notalar: Kestane, Karabiber\nOrta Notalar: Guaiac Ağacı\nDip Notalar: Vanilya, Reçineler", store: "Sephora & Beymen", category: "unisex"},
+      {id: 66, brand: "MAISON MARGIELA", name: "Jazz Club", notes: "Üst Notalar: Pembe Biber\nOrta Notalar: Rom, Vetiver\nDip Notalar: Tütün, Vanilya", store: "Sephora & Beymen", category: "unisex"},
+      {id: 67, brand: "LE LABO", name: "Santal 33", notes: "Üst Notalar: Kakule\nOrta Notalar: Sandal, Deri\nDip Notalar: Misk, Sedir", store: "Beymen", category: "unisex"},
+      {id: 68, brand: "LE LABO", name: "Another 13", notes: "Üst Notalar: Iso E Super\nOrta Notalar: Ambergris\nDip Notalar: Misk, Odunsular", store: "Beymen", category: "unisex"},
+      {id: 69, brand: "BYREDO", name: "Gypsy Water", notes: "��st Notalar: Bergamot, Limon\nOrta Notalar: İğne Yaprakları\nDip Notalar: Sandal, Amber", store: "Beymen", category: "unisex"},
+      {id: 70, brand: "BYREDO", name: "Mojave Ghost", notes: "Üst Notalar: Sapodilla\nOrta Notalar: Menekşe\nDip Notalar: Amber, Misk", store: "Beymen", category: "unisex"},
+      {id: 71, brand: "NISHANE", name: "Hacivat", notes: "Üst Notalar: Ananas, Greyfurt\nOrta Notalar: Paçuli\nDip Notalar: Meşe Yosunu, Odunsular", store: "Beymen", category: "unisex"},
+      {id: 72, brand: "NISHANE", name: "Ani", notes: "Üst Notalar: Zencefil\nOrta Notalar: Vanilya\nDip Notalar: Amber, Sandal", store: "Beymen", category: "unisex"},
+      {id: 73, brand: "AMOUAGE", name: "Interlude", notes: "Üst Notalar: Bergamot, Kekik\nOrta Notalar: Amber, Tütsü\nDip Notalar: Oud, Sandal", store: "Beymen", category: "unisex"},
+      {id: 74, brand: "AMOUAGE", name: "Reflection", notes: "Üst Notalar: Su Notaları\nOrta Notalar: Yasemin, Portakal Çiçeği\nDip Notalar: Sedir, Sandal", store: "Beymen", category: "unisex"},
+      {id: 75, brand: "MAISON FRANCIS KURKDJIAN", name: "Gentle Fluidity Gold", notes: "Üst Notalar: Vanilya\nOrta Notalar: Amber\nDip Notalar: Misk", store: "Beymen", category: "unisex"},
+      {id: 76, brand: "MAISON FRANCIS KURKDJIAN", name: "Gentle Fluidity Silver", notes: "Üst Notalar: Greyfurt\nOrta Notalar: Misk\nDip Notalar: Amber", store: "Beymen", category: "unisex"},
+      {id: 77, brand: "JULIETTE HAS A GUN", name: "Not a Perfume", notes: "Üst Notalar: Cetalox\nOrta Notalar: Cetalox\nDip Notalar: Cetalox", store: "Sephora & Beymen", category: "unisex"},
+      {id: 78, brand: "ZARA", name: "Ebony Wood", notes: "Üst Notalar: Pembe Biber\nOrta Notalar: Karanfil\nDip Notalar: Abanoz Ağacı", store: "Sephora & Beymen", category: "unisex"},
+      {id: 79, brand: "DIPTYQUE", name: "Philosykos", notes: "Üst Notalar: İncir Yaprağı\nOrta Notalar: İncir\nDip Notalar: Sedir, Hindistan Cevizi", store: "Beymen", category: "unisex"},
+      {id: 80, brand: "DIPTYQUE", name: "Tam Dao", notes: "Üst Notalar: Sedir\nOrta Notalar: Sandal\nDip Notalar: Baharatlar", store: "Beymen", category: "unisex"},
+      {id: 81, brand: "ATELIER COLOGNE", name: "Orange Sanguine", notes: "Üst Notalar: Kan Portakalı\nOrta Notalar: Yasemin\nDip Notalar: Sandal", store: "Sephora & Beymen", category: "unisex"},
+      {id: 82, brand: "BOND NO. 9", name: "New York Oud", notes: "Üst Notalar: Gül\nOrta Notalar: Oud\nDip Notalar: Sedir, Amber", store: "Beymen", category: "unisex"},
+      {id: 83, brand: "ESCENTRIC MOLECULES", name: "Molecule 01", notes: "Üst Notalar: Iso E Super\nOrta Notalar: Iso E Super\nDip Notalar: Iso E Super", store: "Sephora & Beymen", category: "unisex"},
+      {id: 84, brand: "JO MALONE", name: "Wood Sage & Sea Salt", notes: "Üst Notalar: Ambrette\nOrta Notalar: Deniz Tuzu\nDip Notalar: Adaçayı", store: "Sephora", category: "unisex"},
+      {id: 85, brand: "JO MALONE", name: "Myrrh & Tonka", notes: "Üst Notalar: Lavanta\nOrta Notalar: Mür\nDip Notalar: Tonka", store: "Sephora", category: "unisex"},
+      {id: 86, brand: "COMMODITY", name: "Milk", notes: "Üst Notalar: Marshmallow\nOrta Notalar: Tonka\nDip Notalar: Amber", store: "Beymen", category: "unisex"},
+      {id: 87, brand: "LATTAFA", name: "Khamrah", notes: "Üst Notalar: Tarçın, Kakule\nOrta Notalar: Pralin\nDip Notalar: Amber, Vanilya", store: "Beymen", category: "unisex"},
+      {id: 88, brand: "SWISS ARABIAN", name: "Shaghaf Oud", notes: "Üst Notalar: Safran\nOrta Notalar: Gül\nDip Notalar: Oud, Vanilya", store: "Beymen", category: "unisex"},
+      {id: 89, brand: "AL HARAMAIN", name: "Amber Oud Gold", notes: "Üst Notalar: Bergamot\nOrta Notalar: Amber\nDip Notalar: Misk, Vanilya", store: "Beymen", category: "unisex"},
+      {id: 90, brand: "NISHANE", name: "Hundred Silent Ways", notes: "Üst Notalar: Mandalina\nOrta Notalar: Tuberose\nDip Notalar: Vanilya", store: "Beymen", category: "unisex"},
+      {id: 91, brand: "NISHANE", name: "Wulong Cha", notes: "Üst Notalar: Bergamot\nOrta Notalar: Çay\nDip Notalar: Misk, İncir", store: "Beymen", category: "unisex"},
+      {id: 92, brand: "FRANCESCA BIANCHI", name: "The Lover's Tale", notes: "Üst Notalar: Bergamot\nOrta Notalar: Deri, Iris\nDip Notalar: Ambergris", store: "Beymen", category: "unisex"},
+      {id: 93, brand: "JULIETTE HAS A GUN", name: "Sunny Side Up", notes: "Üst Notalar: Vanilya\nOrta Notalar: Sandal, Iris\nDip Notalar: Kokos, Kremsi Notalar", store: "Sephora & Beymen", category: "unisex"},
+      {id: 94, brand: "MAISON MARGIELA", name: "Whispers in the Library", notes: "Üst Notalar: Biber\nOrta Notalar: Vanilya\nDip Notalar: Sedir", store: "Sephora & Beymen", category: "unisex"},
+      {id: 95, brand: "MONTALE", name: "Arabians Tonka", notes: "Üst Notalar: Safran\nOrta Notalar: Tonka\nDip Notalar: Oud, Amber", store: "Beymen", category: "unisex"},
+      {id: 96, brand: "MANCERA", name: "Cedrat Boise", notes: "Üst Notalar: Limon\nOrta Notalar: Meyveli Notalar\nDip Notalar: Sedir, Vanilya", store: "Beymen", category: "unisex"},
+      {id: 97, brand: "MANCERA", name: "Black Vanilla", notes: "Üst Notalar: Siyah Frenk Üzümü\nOrta Notalar: Gül, Menekşe\nDip Notalar: Vanilya, Misk", store: "Beymen", category: "unisex"},
+      {id: 98, brand: "XERJOFF", name: "1888", notes: "Üst Notalar: Safran, Karanfil\nOrta Notalar: Gül, Neroli\nDip Notalar: Amber, Sandal", store: "Beymen", category: "unisex"},
+      {id: 99, brand: "BYREDO", name: "Bal d'Afrique", notes: "Üst Notalar: Bergamot\nOrta Notalar: Afrika Menekşesi\nDip Notalar: Amber, Misk", store: "Beymen", category: "unisex"},
+      {id: 100, brand: "SERGE LUTENS", name: "Ambre Sultan", notes: "Üst Notalar: Baharatlar\nOrta Notalar: Amber\nDip Notalar: Sandal", store: "Beymen", category: "unisex"},
+      {id: 101, brand: "ATELIER COLOGNE", name: "Vanille Insensée", notes: "Üst Notalar: Lime\nOrta Notalar: Vanilya\nDip Notalar: Amber, Meşe Yosunu", store: "Sephora & Beymen", category: "unisex"},
+      {id: 102, brand: "DIOR", name: "Sauvage EDT", notes: "Üst Notalar: Bergamot, Sichuan Biberi\nOrta Notalar: Lavanta, Pembe Biber\nDip Notalar: Ambroxan, Sedir, Labdanum", store: "Sephora & Beymen", category: "erkek"},
+      {id: 103, brand: "JO MALONE", name: "Wood Sage & Sea Salt", notes: "Üst Notalar: Deniz Tuzu\nOrta Notalar: Adaçayı\nDip Notalar: Galbanum, Ambrette Tohumu", store: "Sephora", category: "unisex"},
+      {id: 104, brand: "GIORGIO ARMANI", name: "Acqua di Giò Profumo", notes: "Üst Notalar: Bergamot, Deniz Notaları\nOrta Notalar: Sardunya, Biber\nDip Notalar: Tütsü, Paçuli", store: "Beymen", category: "erkek"},
+      {id: 105, brand: "HERMÈS", name: "Terre d'Hermès", notes: "Üst Notalar: Portakal, Greyfurt\nOrta Notalar: Biber, Çakmaktaşı\nDip Notalar: Vetiver, Sedir", store: "Sephora & Beymen", category: "erkek"},
+      {id: 106, brand: "CREED", name: "Aventus", notes: "Üst Notalar: Ananas, Bergamot, Siyah Frenk Üzümü\nOrta Notalar: Yasemin, Huş\nDip Notalar: Misk, Meşe Yosunu, Vanilya", store: "Beymen", category: "erkek"},
+      {id: 107, brand: "CHANEL", name: "Bleu de Chanel EDT", notes: "Üst Notalar: Limon, Nane, Pembe Biber\nOrta Notalar: Zencefil, Yasemin\nDip Notalar: Tütsü, Sedir, Sandal Ağacı", store: "Sephora & Beymen", category: "erkek"},
+      {id: 108, brand: "YVES SAINT LAURENT", name: "Y EDP", notes: "Üst Notalar: Elma, Bergamot, Zencefil\nOrta Notalar: Adaçayı, Sardunya\nDip Notalar: Tonka, Amber, Sedir", store: "Sephora & Beymen", category: "erkek"},
+      {id: 109, brand: "VERSACE", name: "Dylan Blue", notes: "Üst Notalar: Bergamot, Greyfurt\nOrta Notalar: Menekşe Yaprağı, Biber\nDip Notalar: Ambrox, Tonka, Tütsü", store: "Sephora & Beymen", category: "erkek"},
+      {id: 110, brand: "PACO RABANNE", name: "Invictus", notes: "Üst Notalar: Greyfurt, Deniz Notaları\nOrta Notalar: Defne, Yasemin\nDip Notalar: Ambergris, Guaiac, Paçuli", store: "Sephora", category: "erkek"},
+      {id: 111, brand: "JEAN PAUL GAULTIER", name: "Le Male", notes: "Üst Notalar: Nane, Lavanta\nOrta Notalar: Tarçın, Kimyon\nDip Notalar: Vanilya, Tonka, Sandal", store: "Sephora", category: "erkek"},
+      {id: 112, brand: "VALENTINO", name: "Uomo", notes: "Üst Notalar: Bergamot\nOrta Notalar: Fındık, Çikolata\nDip Notalar: Deri, Sedir", store: "Beymen", category: "erkek"},
+      {id: 113, brand: "PRADA", name: "L'Homme", notes: "Üst Notalar: Neroli, Biber\nOrta Notalar: Menekşe, Iris\nDip Notalar: Amber, Paçuli", store: "Beymen", category: "erkek"},
+      {id: 114, brand: "BURBERRY", name: "Mr. Burberry", notes: "Üst Notalar: Greyfurt, Tarhun\nOrta Notalar: Sedir\nDip Notalar: Vetiver, Sandal", store: "Beymen", category: "erkek"},
+      {id: 115, brand: "HUGO BOSS", name: "Boss Bottled", notes: "Üst Notalar: Elma, Tarçın\nOrta Notalar: Karanfil, Mahonya\nDip Notalar: Sandal, Vetiver, Sedir", store: "Sephora & Beymen", category: "erkek"},
+      {id: 116, brand: "DIOR", name: "Homme Intense", notes: "Üst Notalar: Lavanta\nOrta Notalar: Iris, Amber\nDip Notalar: Vetiver, Sedir", store: "Sephora & Beymen", category: "erkek"},
+      {id: 117, brand: "CHANEL", name: "Allure Homme Sport", notes: "Üst Notalar: Mandalina, Portakal\nOrta Notalar: Biber, Neroli\nDip Notalar: Tonka, Misk, Sedir", store: "Sephora", category: "erkek"},
+      {id: 118, brand: "CAROLINA HERRERA", name: "CH Men", notes: "Üst Notalar: Bergamot, Limon\nOrta Notalar: Menekşe, Tarçın\nDip Notalar: Süet, Deri, Vanilya", store: "Sephora", category: "erkek"},
+      {id: 119, brand: "MONTBLANC", name: "Explorer", notes: "Üst Notalar: Bergamot\nOrta Notalar: Vetiver\nDip Notalar: Paçuli, Ambrox", store: "Beymen", category: "erkek"},
+      {id: 120, brand: "TOM FORD", name: "Noir Extreme", notes: "Üst Notalar: Mandalina, Safran\nOrta Notalar: Kulfi, Gül, Yasemin\nDip Notalar: Amber, Sandal, Vanilya", store: "Beymen", category: "erkek"},
+      {id: 121, brand: "GUCCI", name: "Guilty Pour Homme", notes: "Üst Notalar: Lavanta, Limon\nOrta Notalar: Portakal Çiçeği\nDip Notalar: Sedir, Paçuli", store: "Sephora & Beymen", category: "erkek"},
+      {id: 122, brand: "DOLCE & GABBANA", name: "The One for Men", notes: "Üst Notalar: Greyfurt, Kişniş\nOrta Notalar: Zencefil, Kakule\nDip Notalar: Tütün, Amber", store: "Sephora & Beymen", category: "erkek"},
+      {id: 123, brand: "VIKTOR & ROLF", name: "Spicebomb", notes: "Üst Notalar: Bergamot, Pembe Biber\nOrta Notalar: Tarçın, Safran\nDip Notalar: Tütün, Vetiver, Deri", store: "Sephora", category: "erkek"},
+      {id: 124, brand: "AZZARO", name: "Wanted", notes: "Üst Notalar: Limon, Zencefil\nOrta Notalar: Kakule, Ardıç\nDip Notalar: Tonka, Vetiver", store: "Sephora & Beymen", category: "erkek"},
+      {id: 125, brand: "GIVENCHY", name: "Gentleman EDP", notes: "Üst Notalar: Biber, Iris\nOrta Notalar: Paçuli, Lavanta\nDip Notalar: Vanilya, Tolu Balsam", store: "Sephora & Beymen", category: "erkek"},
+      {id: 126, brand: "ISSEY MIYAKE", name: "L'Eau d'Issey Pour Homme", notes: "Üst Notalar: Yuzu\nOrta Notalar: Tarçın, Hindistancevizi\nDip Notalar: Vetiver, Sandal", store: "Sephora", category: "erkek"},
+      {id: 127, brand: "MUGLER", name: "A*Men", notes: "Üst Notalar: Lavanta, Nane\nOrta Notalar: Tarçın, Karamel\nDip Notalar: Paçuli, Kahve, Vanilya", store: "Sephora", category: "erkek"},
+      {id: 128, brand: "SALVATORE FERRAGAMO", name: "Uomo", notes: "Üst Notalar: Bergamot, Karabiber\nOrta Notalar: Tiramisu, Kakule\nDip Notalar: Tonka, Sandal", store: "Beymen", category: "erkek"},
+      {id: 129, brand: "MERCEDES-BENZ", name: "Man Intense", notes: "Üst Notalar: Bergamot, Biberiye\nOrta Notalar: Kakule, Sardunya\nDip Notalar: Amber, Sedir", store: "Beymen", category: "erkek"},
+      {id: 130, brand: "LACOSTE", name: "Blanc", notes: "Üst Notalar: Greyfurt\nOrta Notalar: Ylang-Ylang\nDip Notalar: Sedir, Vetiver", store: "Sephora", category: "erkek"},
+      {id: 131, brand: "BVLGARI", name: "Man in Black", notes: "Üst Notalar: Rom, Baharatlar\nOrta Notalar: Deri, Iris\nDip Notalar: Tonka, Guaiac", store: "Beymen", category: "erkek"},
+      {id: 132, brand: "DUNHILL", name: "Icon", notes: "Üst Notalar: Bergamot, Neroli\nOrta Notalar: Siyah Biber, Lavanta\nDip Notalar: Vetiver, Odunsu Notalar", store: "Beymen", category: "erkek"},
+      {id: 133, brand: "ROCHAS", name: "Rochas Man", notes: "Üst Notalar: Lavanta\nOrta Notalar: Kahve\nDip Notalar: Vanilya, Amber", store: "Sephora", category: "erkek"},
+      {id: 134, brand: "BENTLEY", name: "Bentley for Men Intense", notes: "Üst Notalar: Siyah Biber\nOrta Notalar: Rum, Tarçın\nDip Notalar: Deri, Paçuli", store: "Beymen", category: "erkek"},
+      {id: 135, brand: "ARMAF", name: "Club de Nuit Intense Man", notes: "Üst Notalar: Limon, Bergamot\nOrta Notalar: Yasemin, Menekşe\nDip Notalar: Misk, Amber, Paçuli", store: "Sephora & Beymen", category: "erkek"},
+      {id: 136, brand: "VERSACE", name: "Man Eau Fraîche", notes: "Üst Notalar: Limon, Bergamot\nOrta Notalar: Tarçın Yaprağı\nDip Notalar: Sedir, Misk", store: "Sephora & Beymen", category: "erkek"},
+      {id: 137, brand: "DAVIDOFF", name: "Cool Water", notes: "Üst Notalar: Nane, Lavanta\nOrta Notalar: Neroli, Sardunya\nDip Notalar: Amber, Tütün", store: "Sephora", category: "erkek"},
+      {id: 138, brand: "CALVIN KLEIN", name: "Eternity for Men", notes: "Üst Notalar: Lavanta, Limon\nOrta Notalar: Adaçayı, Sardunya\nDip Notalar: Sandal, Vetiver", store: "Sephora", category: "erkek"},
+      {id: 139, brand: "JOOP!", name: "Homme", notes: "Üst Notalar: Mandalina, Limon\nOrta Notalar: Tarçın\nDip Notalar: Vanilya, Tonka", store: "Sephora", category: "erkek"},
+      {id: 140, brand: "GUERLAIN", name: "L'Homme Idéal", notes: "Üst Notalar: Bergamot, Biberiye\nOrta Notalar: Badem\nDip Notalar: Tonka, Sedir", store: "Beymen", category: "erkek"},
+      {id: 141, brand: "KENNETH COLE", name: "Black", notes: "Üst Notalar: Zencefil\nOrta Notalar: Su Notaları\nDip Notalar: Amber, Misk", store: "Sephora", category: "erkek"},
+      {id: 142, brand: "RASASI", name: "Hawas for Him", notes: "Üst Notalar: Limon, Bergamot\nOrta Notalar: Tarçın, Kakule\nDip Notalar: Ambergris, Misk", store: "Beymen", category: "erkek"},
+      {id: 143, brand: "DUNHILL", name: "Desire Red", notes: "Üst Notalar: Elma\nOrta Notalar: Paçuli\nDip Notalar: Vanilya, Misk", store: "Beymen", category: "erkek"},
+      {id: 144, brand: "ABERCROMBIE & FITCH", name: "Fierce", notes: "Üst Notalar: Kardamom\nOrta Notalar: Biberiye\nDip Notalar: Misk, Vetiver", store: "Sephora", category: "erkek"},
+      {id: 145, brand: "AZZARO", name: "Chrome", notes: "Üst Notalar: Limon\nOrta Notalar: Ananas\nDip Notalar: Misk, Sedir", store: "Sephora", category: "erkek"},
+      {id: 146, brand: "ERMENEGILDO ZEGNA", name: "Uomo", notes: "Üst Notalar: Limon, Bergamot\nOrta Notalar: Menekşe\nDip Notalar: Vetiver", store: "Beymen", category: "erkek"},
+      {id: 147, brand: "LALIQUE", name: "Encre Noire", notes: "Üst Notalar: Selvi\nOrta Notalar: Vetiver\nDip Notalar: Misk, Kaşmir", store: "Beymen", category: "erkek"},
+      {id: 148, brand: "NARCISO RODRIGUEZ", name: "For Him", notes: "Üst Notalar: Menekşe Yaprağı\nOrta Notalar: Misk\nDip Notalar: Amber, Paçuli", store: "Sephora & Beymen", category: "erkek"},
+      {id: 149, brand: "BENTLEY", name: "Infinite Intense", notes: "Üst Notalar: Bergamot\nOrta Notalar: Lavanta, Biber\nDip Notalar: Amber, Vetiver", store: "Beymen", category: "erkek"},
+      {id: 150, brand: "AMOUAGE", name: "Reflection Man", notes: "Üst Notalar: Biberiye\nOrta Notalar: Neroli\nDip Notalar: Sandal, Paçuli", store: "Beymen", category: "erkek"},
+      {id: 151, brand: "RASASI", name: "Fattan Pour Homme", notes: "Üst Notalar: Greyfurt, Limon\nOrta Notalar: Vetiver, Biber\nDip Notalar: Amber, Sedir", store: "Beymen", category: "erkek"}
+    ];
+
+    let favorites = new Set();
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    function getCategoryLabel(category) {
+      const labels = {'kadın': 'Kadın', 'erkek': 'Erkek', 'unisex': 'Unisex'};
+      return labels[category] || category;
+    }
+
+    function filterPerfumes() {
+      let filtered = perfumes;
+      if (currentCategory !== 'all') {
+        filtered = filtered.filter(p => p.category === currentCategory);
+      }
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(p => 
+          p.brand.toLowerCase().includes(query) ||
+          p.name.toLowerCase().includes(query) ||
+          p.notes.toLowerCase().includes(query) ||
+          p.store.toLowerCase().includes(query)
+        );
+      }
+      return filtered;
+    }
+
+    function toggleFavorite(perfumeId) {
+      if (favorites.has(perfumeId)) {
+        favorites.delete(perfumeId);
+      } else {
+        favorites.add(perfumeId);
+      }
+      renderPerfumes();
+    }
+
+    function renderPerfumes() {
+      const grid = document.getElementById('perfume-grid');
+      const filtered = filterPerfumes();
+      
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #d4af37;"><p style="font-size: 20px; margin: 0;">Aradığınız kriterlere uygun parfüm bulunamadı.</p></div>';
+        return;
+      }
+      
+      grid.innerHTML = '';
+      
+      filtered.forEach(perfume => {
+        const card = document.createElement('div');
+        card.className = 'perfume-card';
+        const isFavorited = favorites.has(perfume.id);
+        
+        card.innerHTML = `
+          <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" onclick="toggleFavorite(${perfume.id})">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </button>
+          <div class="category-badge">${getCategoryLabel(perfume.category)}</div>
+          <div class="brand">${perfume.brand}</div>
+          <h2 class="perfume-name">${perfume.name}</h2>
+          <div class="notes-section">
+            <div class="notes-title">Koku Notaları</div>
+            <div class="notes">${perfume.notes.replace(/\n/g, '<br>')}</div>
+          </div>
+        `;
+        
+        grid.appendChild(card);
+      });
+    }
+
+    function setupEventListeners() {
+      const searchInput = document.getElementById('search-input');
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderPerfumes();
+      });
+      
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.dataset.category;
+          renderPerfumes();
+        });
+      });
+    }
+
+    window.toggleFavorite = toggleFavorite;
+
+    async function onConfigChange(config) {
+      document.getElementById('site-title').textContent = config.site_title || defaultConfig.site_title;
+      document.getElementById('site-subtitle').textContent = config.site_subtitle || defaultConfig.site_subtitle;
+      document.body.style.background = `linear-gradient(135deg, ${config.background_color || defaultConfig.background_color} 0%, #1a0a0a 100%)`;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {get: () => config.background_color || defaultConfig.background_color, set: (value) => { config.background_color = value; window.elementSdk.setConfig({ background_color: value }); }},
+          {get: () => config.accent_color || defaultConfig.accent_color, set: (value) => { config.accent_color = value; window.elementSdk.setConfig({ accent_color: value }); }},
+          {get: () => config.border_color || defaultConfig.border_color, set: (value) => { config.border_color = value; window.elementSdk.setConfig({ border_color: value }); }},
+          {get: () => config.text_color || defaultConfig.text_color, set: (value) => { config.text_color = value; window.elementSdk.setConfig({ text_color: value }); }},
+          {get: () => config.card_background || defaultConfig.card_background, set: (value) => { config.card_background = value; window.elementSdk.setConfig({ card_background: value }); }}
+        ],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["site_title", config.site_title || defaultConfig.site_title],
+        ["site_subtitle", config.site_subtitle || defaultConfig.site_subtitle]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({ defaultConfig, onConfigChange, mapToCapabilities, mapToEditPanelValues });
+    }
+
+    setupEventListeners();
+    renderPerfumes();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a53d6373414556b',t:'MTc2NDI2OTY5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
